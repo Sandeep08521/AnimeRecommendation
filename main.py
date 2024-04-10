@@ -4,6 +4,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 import re
 
+
 # Function to preprocess text
 def preprocess_text(text):
     if pd.isna(text):
@@ -14,12 +15,14 @@ def preprocess_text(text):
         text = re.sub(r"[^a-z0-9\s]", "", text)
         return text
 
+
 # Load anime data
 @st.cache_resource
 def load_anime_data(file_path):
     anime_data = pd.read_csv(file_path, encoding='latin1')  # Specify the encoding parameter
     anime_data["Synopsis_processed"] = anime_data["summary"].apply(preprocess_text)
     return anime_data
+
 
 # Function to calculate cosine similarity
 @st.cache_data
@@ -28,6 +31,7 @@ def calculate_similarity(anime_data):
     tfidf_features = tfidf_vectorizer.fit_transform(anime_data['Synopsis_processed'])
     anime_similarities = cosine_similarity(tfidf_features, tfidf_features)
     return anime_similarities
+
 
 # Function to recommend similar anime
 @st.cache_data
@@ -38,6 +42,7 @@ def recommend_anime(anime_name, anime_data, anime_similarities):
     recommended_anime_names = anime_data.iloc[similar_anime_indices]["title"].tolist()
     recommended_anime_summaries = anime_data.iloc[similar_anime_indices]["summary"].tolist()
     return recommended_anime_images, recommended_anime_names, recommended_anime_summaries
+
 
 # Main Streamlit app
 def main():
@@ -57,7 +62,7 @@ def main():
     st.title('Anime Recommendation')
 
     # Load anime data
-    file_path = r"C:\Users\Sandeep\Downloads\anime_rec.csv"  # Replace with your actual file path
+    file_path = r"anime_rec.csv"  # Replace with your actual file path
     anime_data = load_anime_data(file_path)
 
     # Calculate cosine similarity
@@ -77,6 +82,7 @@ def main():
                 st.image(image, caption=name, width=400)  # Increase the image width
             st.subheader(name)  # Display name
             st.write(summary)  # Display summary
+
 
 if __name__ == '__main__':
     main()
